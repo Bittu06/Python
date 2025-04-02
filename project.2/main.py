@@ -22,7 +22,7 @@ if __name__ == "__main__":
             print(f"Energy threshold: {recognizer.energy_threshold}")
             
             # Adjust for ambient noise
-            recognizer.adjust_for_ambient_noise(source, duration=1.0)
+            recognizer.adjust_for_ambient_noise(source, duration= 0.5)
             audio = recognizer.listen(source)
             
             try:
@@ -36,7 +36,7 @@ if __name__ == "__main__":
                     print("Listening for command...")
                     
                     # Adjust for ambient noise again
-                    recognizer.adjust_for_ambient_noise(source, duration=1.0)
+                    recognizer.adjust_for_ambient_noise(source, duration=3.0)
                     audio = recognizer.listen(source)
                     
                     try:
