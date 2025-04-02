@@ -13,12 +13,12 @@ def speak(text):
 
 if __name__ == "__main__":
     # Define wake words (add variations of pronunciation)
-    WAKE_WORDS = ["bittu", "bitu", "beetle", "bitter"]
-    speak("Initializing voice assistant...")
+    WAKE_WORDS = ["alexa", "alex", "alexaa", "Alax", "Alixa", "Alaxa", "Alexha"]
+    speak("Initializing Alexa voice assistant...")
     
     while True:
         with sr.Microphone() as source:
-            print("\nListening for wake word (Say 'Bittu')...")
+            print("\nListening for wake word (Say 'Alexa')...")
             print(f"Energy threshold: {recognizer.energy_threshold}")
             
             # Adjust for ambient noise
@@ -36,7 +36,7 @@ if __name__ == "__main__":
                     print("Listening for command...")
                     
                     # Adjust for ambient noise again
-                    recognizer.adjust_for_ambient_noise(source, duration=0.5)
+                    recognizer.adjust_for_ambient_noise(source, duration=1.0)
                     audio = recognizer.listen(source)
                     
                     try:
