@@ -8,8 +8,9 @@ import time  # Add this with other imports
 import eventregistry
 from eventregistry import *
 import google.generativeai as genai
-import PIL.Image
+from PIL import Image  # Changed this line
 import os
+import json
 
 newsapi = "535b640f-32ce-45a3-b66a-230d5139061f"
 
@@ -43,21 +44,28 @@ def generate_image(prompt):
         # Configure the Gemini API
         genai.configure(api_key="AIzaSyBCy1pehGQZZsn7Sqp3PFsHZxIkAMzLizQ")
         
-        # Create the model (using gemini-pro-vision for image generation)
-        model = genai.GenerativeModel('gemini-pro-vision')
+        # Use the gemini-1.5-pro model for text generation
+        model = genai.GenerativeModel('gemini-1.5-pro')
+        
+        # Create a more specific prompt for image description
+        full_prompt = (
+            f"Please provide a vivid, artistic description of {prompt}. "
+            "Focus on visual details like colors, shapes, textures, and composition."
+        )
         
         # Generate response
-        response = model.generate_content(f"Generate an image of {prompt}")
-        
-        speak(f"I'm sorry, but the current version of Gemini API doesn't support direct image generation. Would you like me to describe what such an image might look like instead?")
+        response = model.generate_content(full_prompt)
         
         if response.text:
-            print(f"Image description: {response.text}")
+            print(f"Image Description: {response.text}")
+            speak("Here's how I would describe that image:")
             speak(response.text)
+        else:
+            speak("I couldn't generate a description for that image.")
             
     except Exception as e:
-        print(f"Error generating image: {e}")
-        speak("Sorry, I encountered an error while trying to generate the image.")
+        print(f"Error generating image description: {e}")
+        speak("Sorry, I encountered an error while trying to create the image description.")
 
 def processCommand(command):
     if any(word in command for word in ["linkedin", "linked in"]):
@@ -96,21 +104,41 @@ def processCommand(command):
 
 def fetch_gemini_response(command):
     try:
-        # Configure the Gemini API
-        genai.configure(api_key="AIzaSyBCy1pehGQZZsn7Sqp3PFsHZxIkAMzLizQ")
+        # API endpoint and key
+        url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent"
+        api_key = "AIzaSyBCy1pehGQZZsn7Sqp3PFsHZxIkAMzLizQ"
         
-        # Create the model
-        model = genai.GenerativeModel('gemini-pro')
+        # Prepare headers and data
+        headers = {
+            'Content-Type': 'application/json'
+        }
         
-        # Generate response
-        response = model.generate_content(command)
+        data = {
+            "contents": [{
+                "parts":[{"text": command}]
+            }]
+        }
         
-        # Get and speak the response
-        if response.text:
-            print(f"Gemini: {response.text}")
-            speak(response.text)
+        # Make the API request
+        response = requests.post(
+            f"{url}?key={api_key}",
+            headers=headers,
+            json=data
+        )
+        
+        # Check if request was successful
+        if response.status_code == 200:
+            result = response.json()
+            if 'candidates' in result:
+                response_text = result['candidates'][0]['content']['parts'][0]['text']
+                print(f"Gemini: {response_text}")
+                speak(response_text)
+            else:
+                speak("I couldn't understand the response format.")
         else:
-            speak("I couldn't generate a response for that.")
+            print(f"API Error: {response.status_code}")
+            print(f"Response: {response.text}")
+            speak("Sorry, I encountered an error while processing your request.")
             
     except Exception as e:
         print(f"Error with Gemini API: {e}")
