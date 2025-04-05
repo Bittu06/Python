@@ -63,6 +63,43 @@ def processCommand(command):
                 print(f"You said: {song_name}")
         except IndexError:
             speak("Please specify a song name")
+    elif "news" in command:
+        try:
+            import requests
+            # Use the provided API key
+            api_key = "500f3ade43304cf685af7716463e415a"
+            url = f"https://newsapi.org/v2/top-headlines?country=us&apiKey={api_key}"
+            
+            response = requests.get(url)
+            news_data = response.json()
+            
+            if response.status_code == 200 and news_data["status"] == "ok":
+                articles = news_data["articles"]
+                speak("Here are the top news headlines:")
+                print("\n===== TOP NEWS HEADLINES =====")
+                
+                # Display and speak the top 5 headlines
+                for i, article in enumerate(articles[:5]):
+                    headline = article["title"]
+                    source = article["source"]["name"]
+                    print(f"{i+1}. {headline} - {source}")
+                    speak(f"News {i+1}: {headline}")
+                    
+                # Open the first news article in browser
+                if articles and "url" in articles[0]:
+                    webbrowser.open(articles[0]["url"])
+            else:
+                speak("Sorry, I couldn't fetch the latest news.")
+                print(f"Error fetching news: {news_data.get('message', 'Unknown error')}")
+        except Exception as e:
+            speak("Sorry, I couldn't fetch the latest news.")
+            print(f"Error fetching news: {e}")
+            # Fallback to BBC news website
+            url = "https://www.bbc.com/news"
+            webbrowser.open(url)
+
+
+
     else:
         speak("Command not recognized")
         print(f"Command not recognized: {command}")
