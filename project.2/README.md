@@ -1,51 +1,74 @@
-# Voice Assistant with Music Player 🎵
+# Alexa-like Voice Assistant 🎵🤖
 
-A Python-based voice assistant that can open websites and play music on command. Similar to Alexa, it responds to voice commands and can handle various tasks.
+A Python-based voice assistant that can handle various tasks including music playback, web navigation, news updates, and AI-powered conversations using the Gemini API.
 
 ## 🚀 Features
 
-- Voice command recognition
+- Voice command recognition with wake word "Alexa"
 - Website navigation (LinkedIn, Google, YouTube, Instagram)
-- Music playback from YouTube
-- Fuzzy matching for song names
-- Wake word detection ("Alexa" and variations)
+- Music playback from YouTube with fuzzy matching
+- Business news updates from Kolkata
+- AI-powered conversations using Google's Gemini API
+- Image description generation
+- Natural language processing
+- Flexible wake word detection
 
 ## 🛠️ Prerequisites
 
 Before running this project, make sure you have Python 3.12+ installed. Then install the required packages:
 
 ```bash
-pip install speechrecognition pyaudio
-pip install setuptools
+pip install speechrecognition
+pip install pyaudio
 pip install pyttsx3
+pip install google-generativeai
+pip install requests
+pip install Pillow
+pip install eventregistry
 ```
 
 ## 📁 Project Structure
 
 ### main.py
 The core voice assistant implementation:
-- Voice recognition and command processing
-- Website navigation functionality
-- Music playback integration
-- Error handling and user feedback
+- Voice recognition and wake word detection
+- Command processing and routing
+- API integrations (Gemini, EventRegistry)
+- Error handling and feedback
 
 ### music.py
-Contains the music library configuration:
+Music library configuration:
 - Dictionary of song names and YouTube URLs
-- Support for Bengali and Hindi songs
-- Easy to extend music collection
+- Bengali and Hindi songs support
+- Fuzzy matching for song names
 
 ## 🎯 Commands
 
-1. **Wake Word**: "Alexa" (and variations)
-2. **Website Commands**:
+1. **Wake Word**: "Alexa" (and variations like "Alex", "Alexaa")
+
+2. **Website Navigation**:
    - "open linkedin"
    - "open google"
    - "open youtube"
    - "open instagram"
-3. **Music Commands**:
+
+3. **Music Playback**:
    - "play [song name]"
+   - Supports fuzzy matching for song names
    - Example: "play Hare Krishna"
+
+4. **News Updates**:
+   - "news"
+   - "tell me the news"
+   - Gets latest business news from Kolkata
+
+5. **Image Descriptions**:
+   - "generate image of [description]"
+   - "create image of [description]"
+
+6. **AI Conversations**:
+   - Ask any question
+   - Get detailed responses powered by Gemini AI
 
 ## 🎵 Available Songs
 - Gori Kalaiya
@@ -53,6 +76,11 @@ Contains the music library configuration:
 - Bhogoban
 - Preme Pora Baron
 - Hare Krishna
+
+## ⚙️ API Keys Required
+- Gemini API Key
+- EventRegistry API Key
+- News API Key
 
 ## 🔧 Setup & Configuration
 
@@ -72,38 +100,46 @@ Contains the music library configuration:
    pip install -r requirements.txt
    ```
 
+4. **Configure API Keys**:
+   Update the following keys in main.py:
+   - `GEMINI_API_KEY`
+   - `NEWS_API_KEY`
+   - `EVENTREGISTRY_API_KEY`
+
 ## 🚀 Running the Application
 
-1. Activate your virtual environment
-2. Run the main script:
+1. Ensure your virtual environment is activated
+2. Check your microphone settings
+3. Run the main script:
    ```bash
    python main.py
    ```
-3. Wait for "Initializing Alexa voice assistant..."
-4. Say "Alexa" to wake up the assistant
-5. Give your command when prompted
+4. Wait for "Initializing Alexa voice assistant..."
+5. Say "Alexa" to wake up the assistant
+6. Give your command when prompted
 
-## 🤝 Contributing
+## 🔍 Troubleshooting
 
-Feel free to fork this project and add your own improvements. Some ideas:
-- Add more commands
-- Expand the music library
-- Improve voice recognition accuracy
-- Add new features
+1. **Microphone Issues**:
+   - Check system audio settings
+   - Verify microphone permissions
+   - Adjust energy threshold if needed
 
-## 📝 License
+2. **API Errors**:
+   - Verify API keys are valid
+   - Check internet connection
+   - Review API quotas and limits
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+3. **Voice Recognition**:
+   - Speak clearly and at normal speed
+   - Minimize background noise
+   - Check microphone volume levels
 
 ## 👤 Author
 
 Bittu Dey
 - LinkedIn: [Bittu Dey](https://www.linkedin.com/in/bittu-dey-71242114b/)
 
-## 🔍 Troubleshooting
+## 📝 License
 
-If you encounter any issues:
-1. Check your microphone settings
-2. Ensure all dependencies are installed
-3. Verify Python version compatibility
-4. Check internet connection for voice recognition
+This project is licensed under the MIT License - see the LICENSE file for details.
