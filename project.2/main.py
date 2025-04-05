@@ -3,10 +3,16 @@ import webbrowser
 import pyttsx3
 from music import music_dict  # Changed from 'music' to 'music_dict'
 from difflib import SequenceMatcher
+import requests  # Add this with other imports
+import time  # Add this with other imports
+import eventregistry
+from eventregistry import *
+
+newsapi = "535b640f-32ce-45a3-b66a-230d5139061f"
 
 recognizer = sr.Recognizer()
 # Adjust the energy threshold for better wake word detection
-recognizer.energy_threshold = 4000
+recognizer.energy_threshold = 4000  
 engine = pyttsx3.init()
 
 def speak(text):
@@ -28,6 +34,8 @@ def find_closest_match(input_song, available_songs, threshold=0.8):
             best_match = song
     
     return best_match
+
+
 
 def processCommand(command):
     if any(word in command for word in ["linkedin", "linked in"]):
@@ -63,46 +71,41 @@ def processCommand(command):
                 print(f"You said: {song_name}")
         except IndexError:
             speak("Please specify a song name")
-    elif "news" in command:
+
+    elif "news" in command or "headline" in command:
         try:
-            import requests
-            # Use the provided API key
-            api_key = "500f3ade43304cf685af7716463e415a"
-            url = f"https://newsapi.org/v2/top-headlines?country=us&apiKey={api_key}"
+            er = EventRegistry(apiKey="535b640f-32ce-45a3-b66a-230d5139061f")
             
-            response = requests.get(url)
-            news_data = response.json()
+            # Create a query for business news articles from New York
+            q = QueryArticlesIter(
+                conceptUri = er.getConceptUri("business"),
+                categoryUri = er.getCategoryUri("business"),
+                sourceLocationUri = er.getLocationUri("Kolkata")
+            )
+
+            speak("Here are today's top business news from Kolkata:")
             
-            if response.status_code == 200 and news_data["status"] == "ok":
-                articles = news_data["articles"]
-                speak("Here are the top news headlines:")
-                print("\n===== TOP NEWS HEADLINES =====")
+            # Get top 5 articles sorted by social media score
+            count = 0
+            for art in q.execQuery(er, sortBy="socialScore", maxItems=10):
+                count += 1
+                title = art.get('title', 'No title available')
+                speak(f"News {count}: {title}")
+                print(f"{count}. {title}")
+                # Add a small pause between articles
+                time.sleep(1)
                 
-                # Display and speak the top 5 headlines
-                for i, article in enumerate(articles[:5]):
-                    headline = article["title"]
-                    source = article["source"]["name"]
-                    print(f"{i+1}. {headline} - {source}")
-                    speak(f"News {i+1}: {headline}")
-                    
-                # Open the first news article in browser
-                if articles and "url" in articles[0]:
-                    webbrowser.open(articles[0]["url"])
-            else:
-                speak("Sorry, I couldn't fetch the latest news.")
-                print(f"Error fetching news: {news_data.get('message', 'Unknown error')}")
+            if count == 0:
+                speak("Sorry, no news articles are available at the moment")
+                
         except Exception as e:
-            speak("Sorry, I couldn't fetch the latest news.")
             print(f"Error fetching news: {e}")
-            # Fallback to BBC news website
-            url = "https://www.bbc.com/news"
-            webbrowser.open(url)
-
-
+            speak("Sorry, I couldn't fetch the news at this moment.")
 
     else:
         speak("Command not recognized")
         print(f"Command not recognized: {command}")
+
 
 if __name__ == "__main__":
     # Define wake words (add variations of pronunciation)
@@ -150,4 +153,3 @@ if __name__ == "__main__":
             except Exception as e:
                 print(f"An error occurred: {e}")
                 speak("An error occurred.")
-
