@@ -7,6 +7,9 @@ import requests  # Add this with other imports
 import time  # Add this with other imports
 import eventregistry
 from eventregistry import *
+import google.generativeai as genai
+import PIL.Image
+import os
 
 newsapi = "535b640f-32ce-45a3-b66a-230d5139061f"
 
@@ -35,7 +38,26 @@ def find_closest_match(input_song, available_songs, threshold=0.8):
     
     return best_match
 
-
+def generate_image(prompt):
+    try:
+        # Configure the Gemini API
+        genai.configure(api_key="AIzaSyBCy1pehGQZZsn7Sqp3PFsHZxIkAMzLizQ")
+        
+        # Create the model (using gemini-pro-vision for image generation)
+        model = genai.GenerativeModel('gemini-pro-vision')
+        
+        # Generate response
+        response = model.generate_content(f"Generate an image of {prompt}")
+        
+        speak(f"I'm sorry, but the current version of Gemini API doesn't support direct image generation. Would you like me to describe what such an image might look like instead?")
+        
+        if response.text:
+            print(f"Image description: {response.text}")
+            speak(response.text)
+            
+    except Exception as e:
+        print(f"Error generating image: {e}")
+        speak("Sorry, I encountered an error while trying to generate the image.")
 
 def processCommand(command):
     if any(word in command for word in ["linkedin", "linked in"]):
@@ -56,13 +78,43 @@ def processCommand(command):
         speak("Opening Instagram")
     elif "play" in command:
         play_song(command)
-
     elif "news" in command:
         fetch_business_news()
-
+    elif "generate image" in command or "create image" in command:
+        # Extract the image description from the command
+        prompt = command.replace("generate image", "").replace("create image", "").strip()
+        if prompt:
+            generate_image(prompt)
+        else:
+            speak("Please specify what kind of image you'd like me to generate.")
     else:
-        speak("Command not recognized")
-        print(f"Command not recognized: {command}")
+        # let Gemini handel the request 
+        fetch_gemini_response(command)
+        
+        """speak("Command not recognized")
+        print(f"Command not recognized: {command}")"""
+
+def fetch_gemini_response(command):
+    try:
+        # Configure the Gemini API
+        genai.configure(api_key="AIzaSyBCy1pehGQZZsn7Sqp3PFsHZxIkAMzLizQ")
+        
+        # Create the model
+        model = genai.GenerativeModel('gemini-pro')
+        
+        # Generate response
+        response = model.generate_content(command)
+        
+        # Get and speak the response
+        if response.text:
+            print(f"Gemini: {response.text}")
+            speak(response.text)
+        else:
+            speak("I couldn't generate a response for that.")
+            
+    except Exception as e:
+        print(f"Error with Gemini API: {e}")
+        speak("Sorry, I encountered an error while processing your request.")
 
 def fetch_business_news():
     try:
