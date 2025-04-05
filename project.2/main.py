@@ -55,56 +55,62 @@ def processCommand(command):
         webbrowser.open(url)
         speak("Opening Instagram")
     elif "play" in command:
-        try:
-            # Get everything after "play"
-            song_name = " ".join(command.split()[1:])
-            # Find the closest match
-            matched_song = find_closest_match(song_name, music_dict.keys())
-            
-            if matched_song:
-                url = music_dict[matched_song]
-                webbrowser.open(url)
-                speak(f"Playing {matched_song}")
-            else:
-                speak("Song not found in the music library.")
-                print(f"Available songs: {', '.join(music_dict.keys())}")
-                print(f"You said: {song_name}")
-        except IndexError:
-            speak("Please specify a song name")
+        play_song(command)
 
-    elif "news" in command or "headline" in command:
-        try:
-            er = EventRegistry(apiKey="535b640f-32ce-45a3-b66a-230d5139061f")
+    elif "news" in command:
+        fetch_business_news()
+
+    else:
+        speak("Command not recognized")
+        print(f"Command not recognized: {command}")
+
+def fetch_business_news():
+    try:
+        er = EventRegistry(apiKey="535b640f-32ce-45a3-b66a-230d5139061f")
             
             # Create a query for business news articles from New York
-            q = QueryArticlesIter(
+        q = QueryArticlesIter(
                 conceptUri = er.getConceptUri("business"),
                 categoryUri = er.getCategoryUri("business"),
                 sourceLocationUri = er.getLocationUri("Kolkata")
             )
 
-            speak("Here are today's top business news from Kolkata:")
+        speak("Here are today's top business news from Kolkata:")
             
             # Get top 5 articles sorted by social media score
-            count = 0
-            for art in q.execQuery(er, sortBy="socialScore", maxItems=10):
-                count += 1
-                title = art.get('title', 'No title available')
-                speak(f"News {count}: {title}")
-                print(f"{count}. {title}")
+        count = 0
+        for art in q.execQuery(er, sortBy="socialScore", maxItems=10):
+            count += 1
+            title = art.get('title', 'No title available')
+            speak(f"News {count}: {title}")
+            print(f"{count}. {title}")
                 # Add a small pause between articles
-                time.sleep(1)
+            time.sleep(1)
                 
-            if count == 0:
-                speak("Sorry, no news articles are available at the moment")
+        if count == 0:
+            speak("Sorry, no news articles are available at the moment")
                 
-        except Exception as e:
-            print(f"Error fetching news: {e}")
-            speak("Sorry, I couldn't fetch the news at this moment.")
+    except Exception as e:
+        print(f"Error fetching news: {e}")
+        speak("Sorry, I couldn't fetch the news at this moment.")
 
-    else:
-        speak("Command not recognized")
-        print(f"Command not recognized: {command}")
+def play_song(command):
+    try:
+            # Get everything after "play"
+        song_name = " ".join(command.split()[1:])
+            # Find the closest match
+        matched_song = find_closest_match(song_name, music_dict.keys())
+            
+        if matched_song:
+            url = music_dict[matched_song]
+            webbrowser.open(url)
+            speak(f"Playing {matched_song}")
+        else:
+            speak("Song not found in the music library.")
+            print(f"Available songs: {', '.join(music_dict.keys())}")
+            print(f"You said: {song_name}")
+    except IndexError:
+        speak("Please specify a song name")
 
 
 if __name__ == "__main__":
